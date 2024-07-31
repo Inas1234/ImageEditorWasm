@@ -1,4 +1,9 @@
-import init, { blur_image, grayscale_img, resize_img } from "./pkg/rustact.js";
+import init, {
+  blur_image,
+  grayscale_img,
+  resize_img,
+  edge_detection,
+} from "./pkg/rustact.js";
 
 async function main() {
   await init();
@@ -15,6 +20,7 @@ async function main() {
   const download_button = document.getElementById("downloadButton");
   const file_name_input = document.getElementById("fileNameInput");
   const reset_button = document.getElementById("resetButton");
+  const edge_button = document.getElementById("edgeButton");
 
   const canvas = document.getElementById("canvas");
   const ctx = canvas.getContext("2d");
@@ -205,6 +211,32 @@ async function main() {
     canvas.height = oldData.height;
     ctx.putImageData(oldData, 0, 0);
     imgData = ctx.getImageData(0, 0, oldData.width, oldData.height);
+  });
+
+  edge_button.addEventListener("click", async () => {
+    if (!imgData) return;
+    const { data, width, height } = imgData;
+    try {
+      const edgeData = await edge_detection(
+        new Uint8Array(data),
+        width,
+        height,
+        50
+      );
+      const outputBlob = new Blob([edgeData], { type: "image/png" });
+      const imgUrl = URL.createObjectURL(outputBlob);
+      const img = new Image();
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(imgUrl);
+        imgData = ctx.getImageData(0, 0, img.width, img.height);
+      };
+      img.src = imgUrl;
+    } catch (err) {
+      console.error("Error edge detection image:", err);
+    }
   });
 
   sliderValue.textContent = blurSlider.value;
