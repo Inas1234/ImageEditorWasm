@@ -3,6 +3,7 @@ import init, {
   grayscale_img,
   resize_img,
   edge_detection,
+  zoom_in,
 } from "./pkg/rustact.js";
 
 async function main() {
@@ -21,11 +22,13 @@ async function main() {
   const file_name_input = document.getElementById("fileNameInput");
   const reset_button = document.getElementById("resetButton");
   const edge_button = document.getElementById("edgeButton");
+  const zoom_in_button = document.getElementById("zoomInButton");
 
   const canvas = document.getElementById("canvas");
   const ctx = canvas.getContext("2d");
 
   let cropping = false;
+  let zoomingIn = false;
   let startX, startY, endX, endY;
   let croppedImgData = null;
   let imgData = null;
@@ -67,6 +70,51 @@ async function main() {
   crop_button.addEventListener("click", () => {
     cropping = true;
     canvas.style.cursor = "crosshair";
+  });
+
+  zoom_in_button.addEventListener("click", () => {
+    zoomingIn = !zoomingIn;
+    if (zoomingIn) canvas.style.cursor = "zoom-in";
+    else canvas.style.cursor = "default";
+  });
+
+  canvas.addEventListener("click", (e) => {
+    if (!zoomingIn) return;
+
+    const { data, width, height } = imgData;
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const mouseX = (e.clientX - rect.left) * scaleX;
+    const mouseY = (e.clientY - rect.top) * scaleY;
+
+    console.log("Mouse X:", mouseX, "Mouse Y:", mouseY);
+
+    try {
+      const zoomedData = zoom_in(
+        new Uint8Array(data),
+        width,
+        height,
+        mouseX,
+        mouseY,
+        2.0
+      );
+      const outputBlob = new Blob([zoomedData], { type: "image/png" });
+      const imgUrl = URL.createObjectURL(outputBlob);
+      const img = new Image();
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(imgUrl);
+        imgData = ctx.getImageData(0, 0, img.width, img.height);
+      };
+      img.src = imgUrl;
+    } catch (err) {
+      console.error("Error zooming in image:", err);
+    }
   });
 
   canvas.addEventListener("mousedown", (e) => {
