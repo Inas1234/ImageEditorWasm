@@ -23,6 +23,9 @@ async function main() {
   const reset_button = document.getElementById("resetButton");
   const edge_button = document.getElementById("edgeButton");
   const zoom_in_button = document.getElementById("zoomInButton");
+  const zoom_factor_slider = document.getElementById("zoomFactorSlider");
+  const zoom_factor_input = document.getElementById("zoomFactorInput");
+  const zoomControls = document.getElementById("zoomControls");
 
   const canvas = document.getElementById("canvas");
   const ctx = canvas.getContext("2d");
@@ -76,12 +79,28 @@ async function main() {
     zoomingIn = !zoomingIn;
     if (zoomingIn) canvas.style.cursor = "zoom-in";
     else canvas.style.cursor = "default";
+
+    if (zoomingIn) {
+      zoomControls.style.display = "flex";
+    } else {
+      zoomControls.style.display = "none";
+    }
+  });
+
+  zoom_factor_input.addEventListener("input", (e) => {
+    zoom_factor_slider.value = e.target.value;
+  });
+
+  zoom_factor_slider.addEventListener("input", (e) => {
+    zoom_factor_input.value = e.target.value;
   });
 
   canvas.addEventListener("click", (e) => {
     if (!zoomingIn) return;
 
     const { data, width, height } = imgData;
+
+    const zoomFactor = parseFloat(zoom_factor_input.value);
 
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
@@ -99,7 +118,7 @@ async function main() {
         height,
         mouseX,
         mouseY,
-        2.0
+        zoomFactor
       );
       const outputBlob = new Blob([zoomedData], { type: "image/png" });
       const imgUrl = URL.createObjectURL(outputBlob);
