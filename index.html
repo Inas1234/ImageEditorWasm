@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rustact</title>
+    <style>
+        #canvas {
+            border: 1px solid black;
+            display: block;
+            margin-bottom: 20px; 
+            align-items: center;
+            margin: 0 auto; 
+        }
+        #controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px; 
+            align-items: center; 
+        }
+        #fileInput, #blurButton, #widthInput, #heightInput, #resizeButton, #cropButton, #grayButton {
+            max-width: 100%; 
+            width: 200px;
+        }
+        #blurButton {
+            padding: 10px; 
+        }
+        #resizeButton {
+            padding: 10px;
+        }
+        #cropButton {
+            padding: 10px;
+        }
+        #grayButton {
+            padding: 10px;
+        }
+        #blurSlider {
+            width: 200px; 
+        }
+        #sliderValue {
+            font-size: 16px; 
+            font-weight: bold; 
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .input-group label {
+            margin-right: 10px; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Editor</h1>
+    <canvas id="canvas"></canvas>
+    <br>
+    <div id="controls">
+        <input type="file" id="fileInput" accept="image/*">
+        <div class="input-group">
+            <label for="widthInput">Width:</label>
+            <input type="number" id="widthInput" value="500" min="1">
+            <label for="heightInput">Height:</label>
+            <input type="number" id="heightInput" value="500" min="1">
+        </div>
+        <label for="blurSlider">
+            Blur Amount: <span id="sliderValue">2</span>
+        </label>
+        <input type="range" id="blurSlider" min="0" max="10" step="0.1" value="2">
+        <button id="blurButton">Apply Blur</button>
+        <button id="resizeButton">Resize</button>
+        <button id="cropButton">Crop</button>
+        <button id="grayButton">Grayscale</button>
+    </div>
+    <script type="module" src="main.js"></script>
+</body>
+</html>
