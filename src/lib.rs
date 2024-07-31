@@ -7,6 +7,7 @@ pub fn hello()  {
     console::log_1(&"Hello from Rust!".into());
 }
 
+
 #[wasm_bindgen]
 pub fn blur_image(image_data: &[u8], width: u32, height: u32, sigma: f32) -> Vec<u8> {
     console::log_1(&"Processing image data...".into());
